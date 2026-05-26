@@ -1,41 +1,32 @@
 import os
 import requests
-import feedparser
 from datetime import datetime
 
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
-RSS_FEED = "https://rss.fxstreet.com/latest-news"
+URL = f"https://newsapi.org/v2/everything?q=forex OR usd OR eur&language=en&sortBy=publishedAt&pageSize=5&apiKey={NEWS_API_KEY}"
 
 def send_to_discord(message):
     requests.post(DISCORD_WEBHOOK_URL, json={"content": message})
 
 def main():
 
-    if not DISCORD_WEBHOOK_URL:
-        raise ValueError("Webhook Discord mancante")
-
-    feed = feedparser.parse(RSS_FEED)
+    response = requests.get(URL)
+    data = response.json()
 
     today = datetime.now().strftime("%d/%m/%Y")
 
     message = f"📰 NOTIZIE FOREX DEL GIORNO - {today}\n\n"
 
-    count = 0
+    for article in data["articles"]:
 
-    for entry in feed.entries:
-
-        title = entry.title
-        link = entry.link
+        title = article["title"]
+        link = article["url"]
 
         message += f"🔹 {title}\n{link}\n\n"
 
-        count += 1
-
-        if count >= 5:
-            break
-
-    message += "⚠️ Fonte: FXStreet"
+    message += "⚠️ Fonte: NewsAPI"
 
     send_to_discord(message)
 
