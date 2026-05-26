@@ -5,7 +5,7 @@ from datetime import datetime
 
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-RSS_FEED = "https://www.myfxbook.com/rss/forex-news"
+RSS_FEED = "https://www.forexfactory.com/ffcal_week_this.xml"
 
 def send_to_discord(message):
     requests.post(DISCORD_WEBHOOK_URL, json={"content": message})
